@@ -1,6 +1,7 @@
 package com.example.springboot_amigoscode_demo_1.student;
 
 
+import ch.qos.logback.core.rolling.helper.IntegerTokenConverter;
 import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -28,6 +29,19 @@ public class StudentManagementController {
         System.out.println("getStudents");
         return students;
     }
+
+    @GetMapping("{studentId}")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN','ROLE_ADMIN_TRAINEE')")
+    public Student getStudentById(@PathVariable("studentId") Integer studentId) {
+        System.out.println("get Student by their id");
+        return students.stream()
+                .filter(student -> studentId.equals(student.getStudentId()))
+                .findFirst()
+                .orElseThrow(() -> new IllegalStateException(
+                        "Student with id " + studentId + " not found"
+                ));
+    }
+
 
     @PostMapping
     @PreAuthorize("hasAuthority('student:write')")
